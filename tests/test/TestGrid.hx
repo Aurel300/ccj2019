@@ -28,6 +28,7 @@ class TestGrid extends Test {
 
   function testDir() {
     eq(Dir.Up.opposite(), Dir.Down);
+    Story;
   }
 
   function testCon() {

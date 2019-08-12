@@ -1,5 +1,6 @@
 --library hxnodejs
 --library utest
+--library pecan
 -D G_TEST
 -cp common
 -cp tests

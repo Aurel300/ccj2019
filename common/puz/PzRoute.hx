@@ -11,22 +11,43 @@ class PzRoute extends Puzzle<PzRouteS, PzRouteI> {
     ]
   ], layers -> new PzRoute(layers[0]));
   public static final levels = PuzzleBank.fromParser(parser, [
+    // @formatter:off
     "tutorial" => ["
 E0--<v
     | 
-E1E1E0"]
+E1E1E0"],
+    "yinyang" => ["
+E0      
+    E0  
+  E1    
+      E1"],
+    "snail" => ["
+            
+  E2        
+            
+    E0E1E2  
+E0E1        "],
+    "twilight" => ["
+    E0E1      
+  E2      E4  
+      E0    E1
+E3            
+    E4  E2    
+  E5      E5  
+  E3          "]
+    // @formatter:on
   ]);
 
   public final map:Grid<PzRouteTile>;
 
   public function new(map:Grid<PzRouteTile>) {
+    super("route", "");
     this.map = map;
   }
 
   override public function start():PzRouteS return new PzRouteS(map);
 
-  override public function tick(s:PzRouteS):PuzzleTick<PzRouteS>
-    return NoChange;
+  override public function tick(s:PzRouteS):PuzzleTick<PzRouteS> return NoChange;
 
   override public function interact(s:PzRouteS, i:PzRouteI):PuzzleTick<PzRouteS> {
     switch (i) {
@@ -58,6 +79,7 @@ E1E1E0"]
 class PzRouteS extends PuzzleState {
   public final map:Grid<PzRouteTile>;
   public final connectivity:Grid<GridCon>;
+
   var endCount:Int;
 
   public function new(map:Grid<PzRouteTile>) {
@@ -98,27 +120,37 @@ class PzRouteS extends PuzzleState {
   }
 
   public function checkSolved():Bool {
-    var endsDone = [ for (i in 0...endCount) false ];
+    var endsDone = [for (i in 0...endCount) false];
     var reject = false;
+    var visited = map.map(_ -> false);
     for (pos => tile in map) {
       switch (tile) {
         case End(i):
           if (endsDone[i])
             continue;
-          Path.flood(connectivity, pos, npos -> switch (map[npos]) {
-            case End(j) if (!pos.equals(npos)):
-              if (i == j)
-                endsDone[i] = true;
-              else
-                reject = true;
-              true;
-            case _:
-              false;
+          Path.flood(connectivity, pos, npos -> {
+            visited[npos] = true;
+            switch (map[npos]) {
+              case End(j) if (!pos.equals(npos)):
+                if (i == j)
+                  endsDone[i] = true;
+                else
+                  reject = true;
+              case _:
+            }
+            false;
           });
         case _:
       }
     }
-    return !reject && endsDone.filter(i -> i).length == endCount;
+    if (reject)
+      return false;
+    var tilesVisited = 0;
+    for (t in visited) {
+      if (t)
+        tilesVisited++;
+    }
+    return tilesVisited == map.w * map.h && endsDone.filter(i -> i).length == endCount;
   }
 }
 

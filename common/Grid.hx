@@ -1,5 +1,6 @@
 typedef GridData<T> = {w:Int, h:Int, d:Array<T>};
 
+@:forward(w, h)
 abstract Grid<T>(GridData<T>) from GridData<T> to GridData<T> {
   public static function fromArray<T>(d:Array<T>, w:Int):Grid<T> {
     if (d.length % w != 0)
