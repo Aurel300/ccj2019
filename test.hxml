@@ -1,0 +1,8 @@
+--library hxnodejs
+--library utest
+-D G_TEST
+-cp common
+-cp tests
+--main TestMain
+--js bin/test.js
+--cmd node bin/test.js

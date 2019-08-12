@@ -1,0 +1,3 @@
+package puz;
+
+class PuzzleState {}
